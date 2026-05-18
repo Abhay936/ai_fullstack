@@ -12,8 +12,8 @@ const Dashboard = () => {
   const fetchEmployees = async (search = '') => {
     try {
       const url = search 
-        ? `http://localhost:5000/api/employees/search?department=${search}`
-        : 'http://localhost:5000/api/employees';
+        ? `/api/employees/search?department=${search}`
+        : '/api/employees';
       const res = await axios.get(url);
       setEmployees(res.data.data);
     } catch (err) {
@@ -38,7 +38,7 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if(window.confirm('Are you sure you want to delete this employee?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/employees/${id}`);
+        await axios.delete(`/api/employees/${id}`);
         fetchEmployees();
       } catch (err) {
         console.error(err);

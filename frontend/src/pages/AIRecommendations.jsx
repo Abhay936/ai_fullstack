@@ -12,7 +12,7 @@ const AIRecommendations = () => {
     setError('');
     try {
       // First fetch all employees to send their IDs
-      const empRes = await axios.get('http://localhost:5000/api/employees');
+      const empRes = await axios.get('/api/employees');
       const employees = empRes.data.data;
       
       if (employees.length === 0) {
@@ -23,7 +23,7 @@ const AIRecommendations = () => {
 
       const empIds = employees.map(emp => emp._id);
 
-      const res = await axios.post('http://localhost:5000/api/ai/recommend', { employeeIds: empIds });
+      const res = await axios.post('/api/ai/recommend', { employeeIds: empIds });
       setRecommendations(res.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch AI recommendations');

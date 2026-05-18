@@ -26,7 +26,7 @@ const EmployeeForm = ({ onAdded }) => {
         performanceScore: Number(formData.performanceScore),
         experience: Number(formData.experience)
       };
-      await axios.post('http://localhost:5000/api/employees', payload);
+      await axios.post('/api/employees', payload);
       onAdded();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add employee');
