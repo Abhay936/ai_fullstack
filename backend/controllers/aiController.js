@@ -32,11 +32,12 @@ exports.getRecommendations = async (req, res, next) => {
       You are an expert HR AI assistant. Analyze the following employee data:
       ${JSON.stringify(employeeData, null, 2)}
       
-      Provide a structured JSON response with the following for each employee or as a summary:
-      1. Promotion Recommendation (Yes/No with reason)
-      2. Employee Ranking (Rank them based on performance and experience)
-      3. Training Suggestions (Based on missing skills or lower performance)
-      4. AI Feedback Generation (Improvement feedback or praise)
+      Provide a structured JSON response with a single root key called "recommendations" which contains an array of objects for each employee. Each object MUST have:
+      - "name": string
+      - "promotion": string (Yes/No with reason)
+      - "ranking": number (Rank them based on performance and experience)
+      - "training": string (Based on missing skills or lower performance)
+      - "feedback": string (Improvement feedback or praise)
       
       Ensure the output is strictly valid JSON without markdown formatting.
     `;
@@ -76,19 +77,32 @@ exports.getRecommendations = async (req, res, next) => {
     );
 
     let aiOutput = response.data.choices[0].message.content;
+    let parsedOutput = null;
     try {
-        // clean if there are markdown code blocks
-        if (aiOutput.startsWith('\`\`\`json')) {
-            aiOutput = aiOutput.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '');
+        let clean = aiOutput.trim();
+        if (clean.startsWith('```json')) {
+            clean = clean.replace(/^```json/, '').replace(/```$/, '').trim();
+        } else if (clean.startsWith('```')) {
+            clean = clean.replace(/^```/, '').replace(/```$/, '').trim();
         }
-        aiOutput = JSON.parse(aiOutput);
+        parsedOutput = JSON.parse(clean);
     } catch (e) {
-        // if not json, just send text
+        console.error('Failed to parse AI output:', aiOutput);
+        return res.status(500).json({ message: 'AI returned invalid data format' });
+    }
+
+    let finalData = {};
+    if (Array.isArray(parsedOutput)) {
+        finalData.recommendations = parsedOutput;
+    } else if (parsedOutput && parsedOutput.recommendations) {
+        finalData = parsedOutput;
+    } else {
+        finalData.recommendations = [parsedOutput];
     }
 
     res.status(200).json({
       success: true,
-      data: aiOutput
+      data: finalData
     });
   } catch (err) {
     console.error(err);
