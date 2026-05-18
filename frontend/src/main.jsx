@@ -7,7 +7,9 @@ import App from './App.jsx'
 import axios from 'axios'
 
 // Set global base URL for all API requests
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+axios.defaults.baseURL = import.meta.env.PROD 
+  ? 'https://ai-backend-q7l2.onrender.com' 
+  : 'http://localhost:5000';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
